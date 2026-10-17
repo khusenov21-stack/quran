@@ -1,0 +1,337 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Проверка чтения Корана</title>
+<link href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=Onest:wght@400;600&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#eef2f0;--card:#fff;--tx:#10231f;--mu:#5d6f6a;--bd:#d3ddd9;--ac:#0f6b52;--acx:#fff;--ok:#167a4c;--yb:#fff0a8;--yt:#5a4600;--ob:#ffdcb0;--ot:#6b3200;--rb:#fde3e3;--rt:#c92a2a;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0d1714;--card:#14231f;--tx:#e6f0ec;--mu:#8fa49d;--bd:#263933;--ac:#3fbf96;--acx:#06201a;--ok:#5be3a6;--yb:#4d4208;--yt:#ffe27a;--ob:#54300c;--ot:#ffb074;--rb:#4a1d1d;--rt:#ff8a8a}}
+:root[data-theme="dark"]{--bg:#0d1714;--card:#14231f;--tx:#e6f0ec;--mu:#8fa49d;--bd:#263933;--ac:#3fbf96;--acx:#06201a;--ok:#5be3a6;--yb:#4d4208;--yt:#ffe27a;--ob:#54300c;--ot:#ffb074;--rb:#4a1d1d;--rt:#ff8a8a}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background:var(--bg);color:var(--tx);font:16px/1.5 Onest,system-ui,sans-serif;padding:16px 14px 110px}
+main{max-width:640px;margin:0 auto}
+h1{font-size:20px;margin:4px 0 12px;font-weight:600}
+.bar{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:12px}
+select{flex:1;min-width:150px;padding:10px;border-radius:10px;border:1px solid var(--bd);background:var(--card);color:var(--tx);font:inherit}
+label.t{display:flex;gap:6px;align-items:center;color:var(--mu);font-size:14px}
+.legend{display:flex;gap:6px;flex-wrap:wrap;font-size:13px;margin-bottom:12px}
+.legend span{padding:2px 9px;border-radius:8px}
+.status{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:12px;border:1px solid var(--bd);background:var(--card);margin-bottom:10px;font-weight:600}
+.dot{width:12px;height:12px;border-radius:50%;background:var(--mu);flex:none}
+.status.on .dot{background:var(--rt);animation:pulse 1s infinite}
+.status.wait .dot{background:#e0a100}
+@keyframes pulse{50%{opacity:.25}}
+@media (prefers-reduced-motion:reduce){.dot{animation:none!important}}
+.live{direction:rtl;font-family:Amiri,"Traditional Arabic",serif;font-size:20px;color:var(--mu);min-height:30px;margin:0 0 10px}
+.card{background:var(--card);border:1px solid var(--bd);border-radius:14px;padding:6px 14px}
+.ayah{direction:rtl;font-family:Amiri,"Traditional Arabic",serif;font-size:30px;line-height:2.2;padding:6px 0;border-bottom:1px solid var(--bd)}
+.ayah:last-child{border-bottom:0}
+.w{padding:0 3px;border-radius:6px;display:inline-block}
+.w.ok{color:var(--ok)}
+.w.yel{background:var(--yb);color:var(--yt)}
+.w.ora{background:var(--ob);color:var(--ot)}
+.w.red{background:var(--rb);color:var(--rt)}
+.w.hid{filter:blur(7px);opacity:.55;user-select:none}
+.w.skip{opacity:.4}
+.ly{background:#f5c400;color:#2a2000;border-radius:4px}
+.lo{background:#ff8a1f;color:#2a1500;border-radius:4px}
+.lr{outline:2px dashed var(--rt);outline-offset:-1px;border-radius:4px}
+.n{font:600 13px Onest,sans-serif;color:var(--mu);border:1px solid var(--bd);border-radius:50%;display:inline-block;width:26px;height:26px;line-height:24px;text-align:center;margin:0 4px;vertical-align:middle}
+.p{font:600 12px Onest,sans-serif;border-radius:8px;padding:1px 6px;margin:0 2px;vertical-align:middle;display:inline-block}
+.p.endp{background:var(--bd);color:var(--mu)}
+.p.mid{background:var(--ob);color:var(--ot)}
+#stats{margin:12px 0;font-size:15px}
+#errs{margin:0;padding:0;list-style:none}
+.err{padding:14px 0;border-bottom:1px solid var(--bd);font-size:15px}
+.eh{display:flex;justify-content:space-between;align-items:center;gap:10px}
+.eh .ar{font-family:Amiri,serif;font-size:28px}
+.tag{font-size:12px;padding:2px 8px;border-radius:8px;font-weight:600}
+.tag.yel{background:var(--yb);color:var(--yt)}.tag.ora{background:var(--ob);color:var(--ot)}.tag.red{background:var(--rb);color:var(--rt)}
+.hd{color:var(--mu);margin:4px 0}
+.err ul{margin:6px 0;padding-left:18px}
+.err li{margin:4px 0}
+.rl{background:var(--bg);border-radius:10px;padding:8px 12px;margin-top:8px}
+.pl{font-size:13px;padding:2px 10px;margin:0 6px;border-radius:999px}
+#rec{flex:1;min-width:150px}
+#msg{color:var(--rt);font-size:14px;min-height:20px;margin:8px 0}
+.note{color:var(--mu);font-size:13px;margin-top:14px}
+.dock{position:fixed;left:0;right:0;bottom:0;display:flex;gap:10px;justify-content:center;padding:12px 14px calc(12px + env(safe-area-inset-bottom,0px));background:var(--bg);border-top:1px solid var(--bd)}
+button{font:600 16px Onest,sans-serif;border-radius:999px;border:1px solid var(--bd);background:var(--card);color:var(--tx);padding:13px 20px}
+#mic{background:var(--ac);color:var(--acx);border-color:var(--ac);min-width:190px}
+#mic.on{background:#c92a2a;border-color:#c92a2a;color:#fff}
+button:focus-visible,select:focus-visible{outline:3px solid var(--ac);outline-offset:2px}
+</style>
+</head>
+<body>
+<main>
+<h1>Проверка чтения Корана</h1>
+<div class="bar">
+<select id="sel" aria-label="Сура"></select>
+<select id="rec" aria-label="Чтец"><option value="">Загружаю чтецов…</option></select>
+<label class="t"><input type="checkbox" id="hide"> Скрывать текст до чтения</label>
+</div>
+<div class="note" id="recnote" style="margin:0 0 10px"></div>
+<div class="legend">
+<span style="color:var(--ok);border:1px solid var(--ok)">зелёный: идеально</span>
+<span style="background:var(--yb);color:var(--yt)">жёлтый: звук чуть не тот</span>
+<span style="background:var(--ob);color:var(--ot)">оранжевый: неточно</span>
+<span style="background:var(--rb);color:var(--rt)">красный: пропуск или грубая ошибка</span>
+</div>
+<div class="status off" id="st" role="status"><span class="dot"></span><span id="sttext">Нажми «Начать чтение» и читай</span></div>
+<div class="live" id="live" aria-live="polite"></div>
+<div class="card" id="text"></div>
+<div id="msg"></div>
+<div id="stats"></div>
+<ul id="errs"></ul>
+<p class="note">Внутри слова цветом выделены отдельные буквы: жёлтая буква означает похожий звук (например, с вместо ص), оранжевая означает другую букву, красная пунктирная рамка означает пропущенную букву. Значок ⏸ показывает паузу. Приложение сверяет буквы с тем, что выдало распознавание речи. Огласовки и длину мадда оно не слышит. Разбор внизу объясняет, чем отличаются буквы и какие правила таджвида есть в слове, но не доказывает, что ты их нарушил. Для точной проверки таджвида нужен учитель. Кнопка ▶ у аята включает чтеца из списка.</p>
+</main>
+<div class="dock">
+<button id="mic">Начать чтение</button>
+<button id="reset">Заново</button>
+</div>
+<script>
+const SURAHS={
+"91":{t:"91. Аш-Шамс",a:["وَالشَّمْسِ وَضُحَاهَا","وَالْقَمَرِ إِذَا تَلَاهَا","وَالنَّهَارِ إِذَا جَلَّاهَا","وَاللَّيْلِ إِذَا يَغْشَاهَا","وَالسَّمَاءِ وَمَا بَنَاهَا","وَالْأَرْضِ وَمَا طَحَاهَا","وَنَفْسٍ وَمَا سَوَّاهَا","فَأَلْهَمَهَا فُجُورَهَا وَتَقْوَاهَا","قَدْ أَفْلَحَ مَن زَكَّاهَا","وَقَدْ خَابَ مَن دَسَّاهَا","كَذَّبَتْ ثَمُودُ بِطَغْوَاهَا","إِذِ انبَعَثَ أَشْقَاهَا","فَقَالَ لَهُمْ رَسُولُ اللَّهِ نَاقَةَ اللَّهِ وَسُقْيَاهَا","فَكَذَّبُوهُ فَعَقَرُوهَا فَدَمْدَمَ عَلَيْهِمْ رَبُّهُم بِذَنبِهِمْ فَسَوَّاهَا","وَلَا يَخَافُ عُقْبَاهَا"]},
+"1":{t:"1. Аль-Фатиха",a:["بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ","الْحَمْدُ لِلَّهِ رَبِّ الْعَالَمِينَ","الرَّحْمَٰنِ الرَّحِيمِ","مَالِكِ يَوْمِ الدِّينِ","إِيَّاكَ نَعْبُدُ وَإِيَّاكَ نَسْتَعِينُ","اهْدِنَا الصِّرَاطَ الْمُسْتَقِيمَ","صِرَاطَ الَّذِينَ أَنْعَمْتَ عَلَيْهِمْ غَيْرِ الْمَغْضُوبِ عَلَيْهِمْ وَلَا الضَّالِّينَ"]},
+"112":{t:"112. Аль-Ихлас",a:["قُلْ هُوَ اللَّهُ أَحَدٌ","اللَّهُ الصَّمَدُ","لَمْ يَلِدْ وَلَمْ يُولَدْ","وَلَمْ يَكُن لَّهُ كُفُوًا أَحَدٌ"]},
+"113":{t:"113. Аль-Фалак",a:["قُلْ أَعُوذُ بِرَبِّ الْفَلَقِ","مِن شَرِّ مَا خَلَقَ","وَمِن شَرِّ غَاسِقٍ إِذَا وَقَبَ","وَمِن شَرِّ النَّفَّاثَاتِ فِي الْعُقَدِ","وَمِن شَرِّ حَاسِدٍ إِذَا حَسَدَ"]},
+"114":{t:"114. Ан-Нас",a:["قُلْ أَعُوذُ بِرَبِّ النَّاسِ","مَلِكِ النَّاسِ","إِلَٰهِ النَّاسِ","مِن شَرِّ الْوَسْوَاسِ الْخَنَّاسِ","الَّذِي يُوَسْوِسُ فِي صُدُورِ النَّاسِ","مِنَ الْجِنَّةِ وَالنَّاسِ"]}
+};
+const $=id=>document.getElementById(id);
+const sel=$("sel");
+const NAMES="Аль-Фатиха|Аль-Бакара|Али Имран|Ан-Ниса|Аль-Маида|Аль-Анам|Аль-Араф|Аль-Анфаль|Ат-Тауба|Юнус|Худ|Юсуф|Ар-Раад|Ибрахим|Аль-Хиджр|Ан-Нахль|Аль-Исра|Аль-Кахф|Марьям|Та Ха|Аль-Анбия|Аль-Хаджж|Аль-Муминун|Ан-Нур|Аль-Фуркан|Аш-Шуара|Ан-Намль|Аль-Касас|Аль-Анкабут|Ар-Рум|Лукман|Ас-Саджда|Аль-Ахзаб|Саба|Фатыр|Йа Син|Ас-Саффат|Сад|Аз-Зумар|Гафир|Фуссилат|Аш-Шура|Аз-Зухруф|Ад-Духан|Аль-Джасия|Аль-Ахкаф|Мухаммад|Аль-Фатх|Аль-Худжурат|Каф|Аз-Зарият|Ат-Тур|Ан-Наджм|Аль-Камар|Ар-Рахман|Аль-Вакиа|Аль-Хадид|Аль-Муджадаля|Аль-Хашр|Аль-Мумтахана|Ас-Сафф|Аль-Джумуа|Аль-Мунафикун|Ат-Тагабун|Ат-Таляк|Ат-Тахрим|Аль-Мульк|Аль-Калям|Аль-Хакка|Аль-Мааридж|Нух|Аль-Джинн|Аль-Музаммиль|Аль-Муддассир|Аль-Кыяма|Аль-Инсан|Аль-Мурсалят|Ан-Наба|Ан-Назиат|Абаса|Ат-Таквир|Аль-Инфитар|Аль-Мутаффифин|Аль-Иншикак|Аль-Бурудж|Ат-Тарик|Аль-Аля|Аль-Гашия|Аль-Фаджр|Аль-Баляд|Аш-Шамс|Аль-Лейль|Ад-Духа|Аш-Шарх|Ат-Тин|Аль-Аляк|Аль-Кадр|Аль-Баййина|Аз-Зальзаля|Аль-Адият|Аль-Кариа|Ат-Такасур|Аль-Аср|Аль-Хумаза|Аль-Филь|Курайш|Аль-Маун|Аль-Каусар|Аль-Кафирун|Ан-Наср|Аль-Масад|Аль-Ихлас|Аль-Фалак|Ан-Нас".split("|");
+NAMES.forEach((nm,q)=>{const o=document.createElement("option");o.value=String(q+1);o.textContent=(q+1)+". "+nm;sel.appendChild(o)});
+const GR=["سصث","تط","دضذظز","حهخ","قكغ","عاء"];
+const conf=(a,b)=>GR.some(g=>g.includes(a)&&g.includes(b));
+let sw=0,hoff=0,lastBI=-1;const WIN=80,cache={};
+let words=[],R=[],RL=[],WI=[],WS=[],acc="",listening=false,rec=null,hyp=[],pauses=[],lastT=0,prevI=0,started=false,res=[],bi=0;
+
+function norm(s){return s.replace(/[\u064B-\u065F\u0670\u0640\u06D6-\u06ED]/g,"").replace(/[أإآٱ]/g,"ا").replace(/ى/g,"ي").replace(/ة/g,"ه").replace(/ؤ/g,"و").replace(/ئ/g,"ي").replace(/[^\u0621-\u064A ]/g,"").replace(/\s+/g," ").trim()}
+function units(w){const u=[];for(const c of w){if(/[\u0621-\u064A\u0671]/.test(c)||!u.length)u.push(c);else u[u.length-1]+=c}return u}
+
+async function load(){
+  const num=sel.value;let ays=SURAHS[num]?SURAHS[num].a:cache[num];
+  if(!ays){
+    stop();words=[];R=[];RL=[];WI=[];WS=[];res=[];bi=0;render();
+    $("msg").textContent="";setStatus("wait","Загружаю текст суры…");
+    try{
+      const r=await fetch("https://api.alquran.cloud/v1/surah/"+num+"/quran-uthmani");
+      const j=await r.json();
+      ays=j.data.ayahs.map((a,q)=>{let t=a.text;if(q===0&&num!=="1"&&num!=="9"){const p=t.split(" ");if(norm(p.slice(0,4).join(" "))==="بسم الله الرحمن الرحيم")t=p.slice(4).join(" ")}return t});
+      cache[num]=ays;
+    }catch(x){
+      if(sel.value!==num)return;
+      setStatus("off","Текст суры не загружен");
+      $("msg").textContent="Не удалось загрузить суру. Нужен интернет. Если страница открыта внутри Claude, загрузка заблокирована: открой её по обычной ссылке, например на tiiny.host.";return}
+    if(sel.value!==num)return;
+  }
+  words=[];
+  ays.forEach((t,ai)=>t.split(" ").forEach(w=>{if(norm(w))words.push({w,ai,last:false})}));
+  words.forEach((x,k)=>{x.last=!words[k+1]||words[k+1].ai!==x.ai});
+  R=words.map(x=>norm(x.w));RL=[];WI=[];WS=[];
+  R.forEach((w,k)=>{WS.push(RL.length);for(const c of w){RL.push(c);WI.push(k)}});WS.push(RL.length);
+  reset();
+}
+function reset(){stop();sw=0;hoff=0;lastBI=-1;acc="";hyp=[];pauses=[];lastT=0;prevI=0;started=false;res=[];bi=0;$("live").textContent="";$("msg").textContent="";setStatus("off","Нажми «Начать чтение» и читай");render()}
+
+function align(){
+  const H=hyp.join("").slice(hoff),base=WS[sw],endW=Math.min(R.length,sw+WIN),n=WS[endW]-base,m=H.length;
+  const RLc=i=>RL[base+i-1];
+  const sc=(i,j)=>RLc(i)===H[j-1]?0:conf(RLc(i),H[j-1])?0.5:1;
+  const near=(x,y)=>Math.abs(x-y)<1e-4;
+  const d=[];for(let i=0;i<=n;i++){d.push(new Float32Array(m+1));d[i][0]=i}
+  for(let j=0;j<=m;j++)d[0][j]=j;
+  for(let i=1;i<=n;i++)for(let j=1;j<=m;j++)d[i][j]=Math.min(d[i-1][j-1]+sc(i,j),d[i-1][j]+1,d[i][j-1]+1);
+  let e=0,bv=1e9;for(let i=0;i<=n;i++)if(d[i][m]<=bv+1e-4){bv=d[i][m];e=i}
+  let cnt=0;while(sw+cnt<endW&&WS[sw+cnt+1]<=base+e+1)cnt++;
+  const B=sw+cnt;
+  let ns=sw,target=-1;if(B-sw>60){ns=B-20;target=WS[ns]-base}
+  const lt=new Array(n).fill("del"),hc=new Array(n).fill(""),hw={};
+  let i=e,j=m,jb;
+  while(i>0||j>0){
+    if(i===target&&jb===undefined)jb=j;
+    if(i>0&&j>0&&near(d[i][j],d[i-1][j-1]+sc(i,j))){const a=RLc(i),hb=H[j-1],g=base+i-1;lt[i-1]=a===hb?"ok":conf(a,hb)?"ys":"so";hc[i-1]=hb;hw[WI[g]]=hb+(hw[WI[g]]||"");i--;j--}
+    else if(i>0&&near(d[i][j],d[i-1][j]+1)){lt[i-1]="del";i--}
+    else{if(i>0){const g=base+i-1;hw[WI[g]]=H[j-1]+(hw[WI[g]]||"")}j--}
+  }
+  for(let k=sw;k<B;k++){
+    const ls=lt.slice(WS[k]-base,WS[k+1]-base),len=ls.length;
+    let sco=0,dels=0;ls.forEach(t=>{if(t==="del"){sco+=1;dels++}else if(t==="so")sco+=1;else if(t==="ys")sco+=0.5});
+    let st;
+    if(dels===len)st="red";else if(sco===0)st="ok";else if(sco<=0.5)st="yel";else if(sco>=2||sco>=len*0.6)st="red";else st="ora";
+    res[k]={st,l:ls,h:hw[k]||"",hc:hc.slice(WS[k]-base,WS[k+1]-base)};
+  }
+  bi=B;
+  if(target>=0&&jb!==undefined){hoff+=jb;sw=ns}
+}
+
+function render(){
+  const hide=$("hide").checked,done=!listening&&started;
+  let html="",ai=-1,pm={};
+  pauses.forEach(p=>{if(p.at>0)pm[p.at-1]=p});
+  words.forEach((x,k)=>{
+    if(x.ai!==ai){if(ai>=0)html+="</div>";ai=x.ai;html+='<div class="ayah"><span class="n">'+(ai+1)+'</span><button class="pl" data-a="'+(ai+1)+'" aria-label="Послушать аят '+(ai+1)+'">▶</button>'}
+    let cls="w",inner=x.w;
+    if(k<bi&&res[k]){
+      cls+=" "+res[k].st;
+      const u=units(x.w);
+      if(res[k].st!=="ok"&&u.length===res[k].l.length)inner=u.map((s,q)=>{const t=res[k].l[q];return t==="ys"?'<span class="ly">'+s+"</span>":t==="so"?'<span class="lo">'+s+"</span>":t==="del"?'<span class="lr">'+s+"</span>":s}).join("");
+    }
+    else if(done)cls+=" skip";
+    else if(hide)cls+=" hid";
+    html+='<span id="w'+k+'" class="'+cls+'">'+inner+"</span> ";
+    if(pm[k])html+='<span class="p '+(x.last?"endp":"mid")+'">⏸ '+(pm[k].ms/1000).toFixed(1)+" с</span>";
+  });
+  if(ai>=0)html+="</div>";
+  $("text").innerHTML=html;
+  if(listening&&bi>0&&bi!==lastBI){lastBI=bi;const el=$("w"+(bi-1));if(el)el.scrollIntoView({block:"center",behavior:"smooth"})}
+  stats();
+}
+function stats(){
+  if(!bi){$("stats").textContent="";$("errs").innerHTML="";return}
+  const c={ok:0,yel:0,ora:0,red:0};let lt=0,lok=0;
+  res.slice(0,bi).forEach(r=>{c[r.st]++;r.l.forEach(t=>{lt++;if(t==="ok")lok++})});
+  const mid=pauses.filter(p=>p.at>0&&!words[p.at-1].last).length;
+  $("stats").innerHTML="Прочитано слов: <b>"+bi+"</b> из "+words.length+". Идеально: <b>"+c.ok+"</b>, звук чуть не тот: <b>"+c.yel+"</b>, неточно: <b>"+c.ora+"</b>, грубо или пропущено: <b>"+c.red+"</b>. Букв верно: <b>"+lok+"</b> из "+lt+" ("+Math.round(lok/lt*100)+"%). Пауз внутри аята: <b>"+mid+"</b>.";
+  const li=errCards();
+  $("errs").innerHTML=li;
+}
+
+function setStatus(k,t){$("st").className="status "+k;$("sttext").textContent=t}
+function onResult(e){
+  const parts=[];for(let i=0;i<e.results.length;i++){const t=e.results[i][0].transcript,nt=norm(t);while(parts.length&&nt.startsWith(norm(parts[parts.length-1])))parts.pop();parts.push(t)}
+  const cur=parts.join(" ")+" ";
+  const full=norm(acc+" "+cur);
+  hyp=full?full.split(" "):[];
+  $("live").textContent=cur;setStatus("on","Идёт запись — слышу тебя");
+  const now=Date.now();
+  if(lastT&&now-lastT>1800)pauses.push({at:prevI,ms:now-lastT});
+  lastT=now;
+  align();prevI=bi;render();
+}
+async function start(){
+  const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
+  if(!SR){setStatus("off","Распознавание речи не поддерживается");$("msg").textContent="Этот браузер не поддерживает распознавание речи. Открой страницу в Chrome или Edge.";return}
+  reset();setStatus("wait","Запрашиваю доступ к микрофону…");
+  try{const s=await navigator.mediaDevices.getUserMedia({audio:true});s.getTracks().forEach(t=>t.stop())}
+  catch(x){if(navigator.mediaDevices&&x&&(x.name==="NotAllowedError"||x.name==="NotFoundError")){setStatus("off","Микрофон недоступен, запись не идёт");$("msg").textContent="Нет доступа к микрофону. Разреши его для этой страницы в настройках браузера.";return}}
+  started=true;listening=true;$("mic").textContent="Остановить";$("mic").classList.add("on");
+  setStatus("wait","Включаю запись…");
+  spawn(SR);render();
+  setTimeout(()=>{if(listening&&!hyp.length)$("msg").textContent="Пока ничего не слышно. Проверь микрофон."},7000);
+}
+function spawn(SR){
+  rec=new SR();rec.lang="ar-SA";rec.continuous=true;rec.interimResults=true;
+  rec.onresult=onResult;rec.onstart=()=>setStatus("on","Идёт запись — читай");
+  rec.onerror=e=>{if(e.error==="not-allowed"||e.error==="service-not-allowed"){$("msg").textContent="Нет доступа к микрофону. Разреши его в настройках браузера для этой страницы.";listening=false;ui()}else if(e.error!=="no-speech"&&e.error!=="aborted")$("msg").textContent="Ошибка распознавания: "+e.error};
+  rec.onend=()=>{if(listening){acc=hyp.join(" ");try{spawn(SR)}catch(x){}}else ui()};
+  try{rec.start()}catch(x){}
+}
+function ui(){$("mic").textContent="Начать чтение";$("mic").classList.remove("on");if(started)setStatus("off","Запись остановлена");render()}
+function stop(){if(rec){listening=false;try{rec.stop()}catch(x){}rec=null}ui()}
+$("mic").onclick=()=>{listening?stop():start()};
+$("reset").onclick=reset;
+$("hide").onchange=render;
+sel.onchange=load;
+const MK={"ا":"из самой глубины горла (хамза: короткая резкая смычка)","ء":"из самой глубины горла (хамза: короткая резкая смычка)","ه":"из глубины горла, лёгкий выдох","ع":"из середины горла, горло слегка сжимается","ح":"из середины горла, тонкий шипящий выдох без голоса","غ":"из верха горла, горловое «г»","خ":"из верха горла, горловое «х»","ق":"из самой глубины рта: задняя часть языка касается мягкого нёба","ك":"чуть впереди «ق»: задняя часть языка у нёба","ج":"из середины языка и нёба","ش":"из середины языка и нёба","ي":"из середины языка и нёба","ض":"из бокового края языка и коренных зубов","ل":"кончик языка у верхних дёсен","ن":"кончик языка у верхних дёсен, чуть ниже «ل»","ر":"кончик языка с лёгкой вибрацией","ط":"кончик языка и дёсны верхних резцов","د":"кончик языка и дёсны верхних резцов","ت":"кончик языка и дёсны верхних резцов","ظ":"кончик языка и край верхних резцов","ذ":"кончик языка и край верхних резцов","ث":"кончик языка и край верхних резцов","ص":"кончик языка у нижних резцов","س":"кончик языка у нижних резцов","ز":"кончик языка у нижних резцов","ف":"нижняя губа и верхние резцы","ب":"обе губы","م":"обе губы","و":"округлённые губы"};
+const HV="خصضغطقظ";
+function why(a,b){
+  let s="Нужно «"+a+"»: "+(MK[a]||"")+". Услышано «"+b+"»: "+(MK[b]||"")+". ";
+  const ha=HV.includes(a),hb=HV.includes(b);
+  if(ha&&!hb)s+="«"+a+"» тяжёлая буква: язык поднимается к нёбу, звук полный и густой. Не облегчай его.";
+  else if(!ha&&hb)s+="«"+a+"» лёгкая буква: язык не поднимается. Не утяжеляй звук.";
+  else if(MK[a]&&MK[a]===MK[b])s+="Место выхода одно и то же, различие в характере звука: произноси точнее.";
+  else s+="Это разные места выхода: проверь, какой частью рта ты произносишь.";
+  return s;
+}
+function whyDel(a){
+  if("اويى".includes(a))return "Буква «"+a+"» не слышна. Это буква протяжки (мадд): если её не дотянуть, долгий звук станет коротким. Тяни 2 счёта.";
+  if(a==="ن"||a==="م")return "Буква «"+a+"» не слышна. Не проглатывай «"+a+"»: она произносится чётко или с носовым звуком (гунна) по правилам.";
+  return "Буква «"+a+"» не слышна. Она выходит "+(MK[a]||"из своего места")+". Читай чуть медленнее и не проглатывай её.";
+}
+function noonRule(kind,c,inside){
+  if(inside&&(c==="ي"||c==="و"))return kind+" перед «"+c+"» в одном слове: изхар, читается чётко, без слияния.";
+  if("ءهعحغخ".includes(c))return kind+" перед «"+c+"»: изхар, читается чётко, без носового звука и без слияния.";
+  if("ينمو".includes(c))return kind+" перед «"+c+"»: идгам с гунной, сливается со следующей буквой с носовым звуком (около 2 счётов).";
+  if("لر".includes(c))return kind+" перед «"+c+"»: идгам без гунны, полностью сливается со следующей буквой, без носового звука.";
+  if(c==="ب")return kind+" перед «ب»: иклаб, звук превращается в скрытую «м» с носовым звуком (около 2 счётов).";
+  return kind+" перед «"+c+"»: ихфа, звук скрывается с носовым звуком (около 2 счётов), язык не касается нёба.";
+}
+function meemRule(c){
+  if(c==="ب")return "Мим с сукуном перед «ب»: ихфа шафави, «м» скрывается с носовым звуком, губы лишь слегка смыкаются.";
+  if(c==="م")return "Мим с сукуном перед «م»: идгам шафави, сливается со следующей «м» с носовым звуком.";
+  return "Мим с сукуном перед «"+c+"»: изхар шафави, «м» читается чётко, губы закрываются."+(c==="ف"||c==="و"?" Не сливай её с «"+c+"».":"");
+}
+function rulesOf(k){
+  const u=units(words[k].w),r=R[k],out=[];
+  const nextL=q=>{if(q+1<u.length)return norm(u[q+1])[0]||"";if(words[k].last)return "";const nw=R[k+1];if(!nw)return "";if(nw.startsWith("ال"))return "ل";return nw[0]==="ا"?"":nw[0]};
+  const sk=/[\u0652\u06E1]/,tw=/[\u064B-\u064D]/,nov=/[\u064B-\u0652\u0670]/;
+  const q0=r[0]==="ا"?0:("وفبكل".includes(r[0])&&r[1]==="ا")?1:-1;
+  const art=q0>=0&&u[q0+1]&&norm(u[q0+1])[0]==="ل"&&!/[\u064B-\u0650]/.test(u[q0+1])&&r.slice(q0)!=="الله"&&r.length>q0+2;
+  if(art){const c=r[q0+2];out.push("تثدذرزسشصضطظلن".includes(c)?"Лям шамсия: «ل» в артикле не читается, следующая буква «"+c+"» произносится удвоенной.":"Лям камария: «ل» в артикле читается чётко.")}
+  u.forEach((s,q)=>{
+    const b=norm(s)[0]||"";if(!b)return;
+    const lastU=words[k].last&&q===u.length-1;
+    if("قطبجد".includes(b)&&sk.test(s))out.push("Калькаля: «"+b+"» с сукуном читается с лёгким отскоком, как эхо.");
+    if((b==="ن"||b==="م")&&/\u0651/.test(s))out.push("Гунна: «"+b+"» с ташдидом читается с носовым звуком около 2 счётов.");
+    const isArtAlef=art&&q===q0;
+    const mad=/\u0670/.test(s)||(q>0&&!isArtAlef&&!nov.test(s)&&((b==="ا"&&/\u064E/.test(u[q-1]))||(b==="و"&&/\u064F/.test(u[q-1]))||(b==="ي"&&/\u0650/.test(u[q-1]))));
+    if(mad)out.push("Натуральный мадд: долгий звук тянется 2 счёта, не короче и не длиннее.");
+    if(/\u0653/.test(s))out.push("Удлинённый мадд: звук тянется дольше обычного (4–6 счётов, в зависимости от вида мадда).");
+    const isN=b==="ن"&&sk.test(s),isT=tw.test(s);
+    if((isN||isT)&&!lastU){const c=nextL(q);if(c)out.push(noonRule(isN?"Нун с сукуном":"Танвин",c,q+1<u.length))}
+    if(b==="م"&&sk.test(s)&&!lastU){const c=nextL(q);if(c)out.push(meemRule(c))}
+  });
+  return out.filter((x,i)=>out.indexOf(x)===i);
+}
+const SN={yel:"жёлтый: звук чуть не тот",ora:"оранжевый: неточно",red:"красный: пропуск или грубая ошибка"};
+function errCards(){
+  let li="";
+  res.slice(0,bi).forEach((r,k)=>{
+    if(r.st==="ok")return;
+    const det=[];
+    if(r.l.every(t=>t==="del"))det.push("Слово пропущено целиком. Вернись и прочитай его.");
+    else r.l.forEach((t,q)=>{const a=R[k][q];if(t==="del")det.push(whyDel(a));else if(t==="ys"||t==="so")det.push(why(a,r.hc[q]))});
+    const ru=rulesOf(k);
+    li+='<li class="err"><div class="eh"><span class="ar" dir="rtl">'+words[k].w+'</span><span class="tag '+r.st+'">'+SN[r.st]+"</span></div>"+(r.h?'<div class="hd">Услышано: <span dir="rtl">'+r.h+"</span></div>":"")+"<ul>"+det.map(x=>"<li>"+x+"</li>").join("")+"</ul>"+(ru.length?'<div class="rl"><b>Правила таджвида в этом слове</b><ul>'+ru.map(x=>"<li>"+x+"</li>").join("")+"</ul></div>":"")+"</li>";
+  });
+  return li;
+}
+let au=null;
+async function playAyah(n){
+  const ed=$("rec").value;
+  if(!ed){$("msg").textContent="Выбери чтеца из списка. Список загружается из интернета.";return}
+  if(listening)stop();
+  try{
+    const j=await (await fetch("https://api.alquran.cloud/v1/ayah/"+sel.value+":"+n+"/"+ed)).json();
+    if(au)au.pause();
+    au=new Audio(j.data.audio);await au.play();$("msg").textContent="";
+  }catch(x){$("msg").textContent="Не удалось включить аудио. Проверь интернет и открой страницу по обычной ссылке."}
+}
+async function loadRecs(){
+  const r=$("rec");
+  try{
+    const j=await (await fetch("https://api.alquran.cloud/v1/edition?format=audio&language=ar")).json();
+    const L=j.data.filter(x=>x.type!=="translation"&&x.identifier);
+    const pri=[/dos|dussar/i,/salim|salemi/i,/saleh/i,/alafasy/i,/husary|hosary/i,/minshawi/i,/basit/i,/muaiqly|mueaqly/i,/sudais/i,/shuraym|shuraim/i];
+    const rank=x=>{const i=pri.findIndex(p=>p.test(x.englishName+" "+x.identifier));return i<0?99:i};
+    L.sort((a,b)=>rank(a)-rank(b)||a.englishName.localeCompare(b.englishName));
+    r.innerHTML="";
+    L.forEach(x=>{const o=document.createElement("option");o.value=x.identifier;o.textContent="Чтец: "+x.englishName;r.appendChild(o)});
+    const want=[["Ясир ад-Дусари",/dos|dussar/i],["Мансур ас-Сальми",/salim|salemi/i],["Хасан Салих",/saleh/i]];
+    const miss=want.filter(w=>!L.some(x=>w[1].test(x.englishName+" "+x.identifier))).map(w=>w[0]);
+    $("recnote").textContent=miss.length?"В базе аудио нет чтецов: "+miss.join(", ")+". Остальных можно выбрать в списке.":"";
+  }catch(x){
+    r.innerHTML='<option value="">Чтецы не загружены</option>';
+    $("recnote").textContent="Список чтецов загружается из интернета. Если страница открыта внутри Claude, он заблокирован: открой её по обычной ссылке.";
+  }
+}
+$("text").addEventListener("click",e=>{const b=e.target.closest&&e.target.closest("button.pl");if(b)playAyah(+b.dataset.a)});
+load();
+loadRecs();
+</script>
+</body>
+</html>
